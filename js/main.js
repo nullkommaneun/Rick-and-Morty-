@@ -8,8 +8,9 @@ const translations = {
     "Status": "Status", "Alive": "Lebendig", "Dead": "Verstorben", "unknown": "unbekannt",
     "Species": "Spezies", "Human": "Mensch", "Alien": "Alien", "Humanoid": "Humanoid",
     "Mythological Creature": "Mythologisches Wesen", "Poopybutthole": "Poopybutthole", "Cronenberg": "Cronenberg",
-    // NEUE ÜBERSETZUNGEN FÜR DAS MODAL
-    "Origin:": "Herkunft:", "Last known location:": "Letzter bekannter Ort:"
+    "Origin:": "Herkunft:", "Last known location:": "Letzter bekannter Ort:",
+    // NEU: Übersetzung für den Wiki-Button
+    "Read more on the Wiki": "Mehr im Rick and Morty Wiki lesen"
 };
 
 function t(key) {
@@ -24,22 +25,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const welcomeMessageContainer = document.getElementById('welcome-message');
     const loader = document.getElementById('loader');
     
-    // NEU: Elemente für das Modal auswählen
     const modal = document.getElementById('character-modal');
     const modalCloseButton = document.getElementById('modal-close-button');
     const modalCharacterDetails = document.getElementById('modal-character-details');
 
     const API_BASE_URL = 'https://rickandmortyapi.com/api';
     
-    // NEU: Ein temporärer Speicher für die Charakterdaten der aktuell angezeigten Episode
     let currentEpisodeCharacters = [];
 
     const showLoader = () => loader.style.display = 'flex';
     const hideLoader = () => loader.style.display = 'none';
 
-    async function fetchAllEpisodes() { /* ... unverändert ... */ }
-    
-    // ... Die Funktion fetchAllEpisodes bleibt exakt gleich ...
     async function fetchAllEpisodes() {
         showLoader();
         let allEpisodes = [];
@@ -54,9 +50,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return allEpisodes;
     }
 
-    function renderEpisodeList(episodes) { /* ... unverändert ... */ }
-    
-    // ... Die Funktion renderEpisodeList bleibt exakt gleich ...
     function renderEpisodeList(episodes) {
         const episodesBySeason = episodes.reduce((acc, episode) => {
             const season = parseInt(episode.episode.substring(1, 3));
@@ -85,7 +78,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-
     async function displayEpisodeDetails(episodeId) {
         showLoader();
         try {
@@ -93,8 +85,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const episode = await episodeResponse.json();
             
             const characterPromises = episode.characters.map(url => fetch(url).then(res => res.json()));
-            
-            // GEÄNDERT: Speichere die geladenen Charakterdaten
             currentEpisodeCharacters = await Promise.all(characterPromises);
 
             episodeDetailsContainer.innerHTML = `
@@ -113,6 +103,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     `).join('')}
                 </div>
             `;
+            
+            // KORRIGIERT: Event-Listener für die neuen Karten hinzufügen
+            addCardClickListeners();
+
         } catch (error) {
             episodeDetailsContainer.innerHTML = `<p>${t('Error loading details. Get Schwifty!')}</p>`;
             console.error(error);
@@ -121,8 +115,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // NEU: Funktion zum Anzeigen des Modals mit Charakterdetails
+    // KORRIGIERT & NEU: Diese Funktion registriert die Klicks auf den Karten
+    function addCardClickListeners() {
+        const cards = document.querySelectorAll('.character-card');
+        cards.forEach(card => {
+            card.addEventListener('click', () => {
+                const characterId = parseInt(card.dataset.characterId);
+                const character = currentEpisodeCharacters.find(c => c.id === characterId);
+                if (character) {
+                    showCharacterModal(character);
+                }
+            });
+        });
+    }
+
     function showCharacterModal(character) {
+        // NEU: Erstelle den dynamischen Wiki-Link
+        const wikiName = character.name.replace(/ /g, '_'); // Ersetzt Leerzeichen durch Unterstriche
+        const wikiUrl = `https://rickandmorty.fandom.com/wiki/${wikiName}`;
+
         modalCharacterDetails.innerHTML = `
             <div class="modal-character-layout">
                 <img src="${character.image}" alt="${character.name}">
@@ -132,33 +143,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     <p><strong>${t('Species')}:</strong> ${t(character.species)}</p>
                     <p><strong>${t('Origin:')}</strong> ${character.origin.name}</p>
                     <p><strong>${t('Last known location:')}</strong> ${character.location.name}</p>
+                    
+                    <a href="${wikiUrl}" target="_blank" class="wiki-link">${t('Read more on the Wiki')}</a>
                 </div>
             </div>
         `;
         modal.classList.add('visible');
     }
 
-    // NEU: Funktion zum Schließen des Modals
     function closeCharacterModal() {
         modal.classList.remove('visible');
     }
     
-    // NEU: Event Listener für Klicks auf die Charakterkarten (Event Delegation)
-    episodeDetailsContainer.addEventListener('click', (event) => {
-        const card = event.target.closest('.character-card');
-        if (card) {
-            const characterId = parseInt(card.dataset.characterId);
-            const character = currentEpisodeCharacters.find(c => c.id === characterId);
-            if (character) {
-                showCharacterModal(character);
-            }
-        }
-    });
-
-    // NEU: Event Listeners zum Schließen des Modals
     modalCloseButton.addEventListener('click', closeCharacterModal);
     modal.addEventListener('click', (event) => {
-        // Schließe das Modal nur, wenn direkt auf den dunklen Hintergrund geklickt wird
         if (event.target === modal) {
             closeCharacterModal();
         }
@@ -173,4 +171,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
     init();
 });
- 
