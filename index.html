@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rick and Morty Episodenguide</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <header>
+        <h1>Rick and Morty Episodenguide</h1>
+    </header>
+
+    <div class="main-container">
+        <aside class="episode-list-container">
+            <h2>Episoden</h2>
+            <div id="episode-list">
+                </div>
+        </aside>
+
+        <main id="episode-details" class="episode-details-container">
+            <div id="welcome-message">
+                <h2>Wähle eine Episode aus, um Details zu sehen!</h2>
+                <p>Wubba Lubba Dub Dub!</p>
+            </div>
+            </main>
+    </div>
+
+    <div id="loader" class="loader-overlay" style="display: none;">
+        <img src="https://i.gifer.com/origin/ce/ce2087d8c54323c5c9325964d4b1a43c_w200.gif" alt="Loading...">
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
