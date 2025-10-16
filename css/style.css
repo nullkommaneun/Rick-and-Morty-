@@ -272,3 +272,24 @@ header {
         font-size: 2rem;
     }
 }
+/* --- NEU: Styling für den Wiki-Link-Button im Modal --- */
+
+.wiki-link {
+    display: inline-block;
+    margin-top: 1.5rem;
+    padding: 0.75rem 1.5rem;
+    background-color: var(--portal-green);
+    color: var(--background-color);
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    letter-spacing: 1px;
+    text-decoration: none;
+    border-radius: 8px;
+    border: 2px solid var(--portal-green);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.wiki-link:hover {
+    background-color: transparent;
+    color: var(--portal-green);
+}
