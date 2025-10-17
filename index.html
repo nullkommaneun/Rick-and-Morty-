@@ -4,7 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rick and Morty Episodenguide</title>
+
+    <meta name="author" content="Dein Name">
+    <meta name="description" content="Ein interaktiver Episodenguide für die Serie Rick and Morty. Durchsuche alle Staffeln, Episoden und Charaktere.">
     
+    <meta property="og:title" content="Rick and Morty Episodenguide">
+    <meta property="og:description" content="Der ultimative interaktive Guide für alle Fans von Rick and Morty.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://DEIN-GITHUB-USERNAME.github.io/DEIN-REPO-NAME/">
+    <meta property="og:image" content="https://rickandmortyapi.com/api/character/avatar/1.jpeg"> 
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
@@ -15,34 +24,38 @@
 
     <header>
         <h1>Rick and Morty Episodenguide</h1>
+        <a href="meeseeks.html" class="back-link" style="position: absolute; top: 20px; right: 20px; text-decoration: none; font-weight: bold; font-size: 1.1rem;">
+            Frage Mr. Meeseeks! &rarr;
+        </a>
     </header>
 
-    <div class="main-container">
+    <main class="main-container">
         <aside class="episode-list-container">
             <div class="selection-controls">
                 <label for="season-select">Wähle eine Staffel:</label>
-                <select id="season-select"></select>
+                <select id="season-select" aria-label="Staffelauswahl"></select>
             </div>
             <div id="episode-list">
                 </div>
         </aside>
 
-        <main id="episode-details" class="episode-details-container">
+        <section id="episode-details" class="episode-details-container">
             <div id="welcome-message"></div>
-        </main>
-    </div>
+            </section>
+    </main>
 
     <div id="loader" class="loader-overlay" style="display: none;">
-        <img src="https://c.tenor.com/CVYdm82i6L0AAAAC/portal-rick-and-morty.gif" alt="Laden...">
+        <img src="https://c.tenor.com/CVYdm82i6L0AAAAC/portal-rick-and-morty.gif" alt="Portal öffnet sich...">
     </div>
 
     <div id="character-modal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
-            <span id="modal-close-button" class="modal-close">&times;</span>
+            <span id="modal-close-button" class="modal-close" title="Schließen">&times;</span>
             <div id="modal-character-details"></div>
         </div>
     </div>
 
     <script src="js/main.js"></script>
+
 </body>
 </html>
