@@ -9,28 +9,25 @@ const translations = {
     "Species": "Spezies", "Human": "Mensch", "Alien": "Alien", "Humanoid": "Humanoid",
     "Mythological Creature": "Mythologisches Wesen", "Poopybutthole": "Poopybutthole", "Cronenberg": "Cronenberg",
     "Origin:": "Herkunft:", "Last known location:": "Letzter bekannter Ort:",
-    // NEU: Übersetzung für den Wiki-Button
     "Read more on the Wiki": "Mehr im Rick and Morty Wiki lesen"
 };
 
-function t(key) {
-    return translations[key] || key;
-}
+function t(key) { return translations[key] || key; }
 
 document.addEventListener('DOMContentLoaded', () => {
-
+    // DOM Elemente
     const episodeListContainer = document.getElementById('episode-list');
     const episodeDetailsContainer = document.getElementById('episode-details');
-    const episodeListTitle = document.getElementById('episode-list-title');
     const welcomeMessageContainer = document.getElementById('welcome-message');
     const loader = document.getElementById('loader');
-    
     const modal = document.getElementById('character-modal');
     const modalCloseButton = document.getElementById('modal-close-button');
     const modalCharacterDetails = document.getElementById('modal-character-details');
+    const seasonSelect = document.getElementById('season-select'); // NEU
 
+    // Globale Variablen
     const API_BASE_URL = 'https://rickandmortyapi.com/api';
-    
+    let episodesBySeason = {}; // NEU: Speichert alle Episoden, nach Staffeln sortiert
     let currentEpisodeCharacters = [];
 
     const showLoader = () => loader.style.display = 'flex';
@@ -49,33 +46,30 @@ document.addEventListener('DOMContentLoaded', () => {
         hideLoader();
         return allEpisodes;
     }
+    
+    // NEU: Befüllt das Staffel-Dropdown-Menü
+    function populateSeasonSelector() {
+        const seasons = Object.keys(episodesBySeason).sort((a, b) => a - b);
+        seasonSelect.innerHTML = seasons.map(season => `<option value="${season}">${t('Season')} ${season}</option>`).join('');
+    }
 
-    function renderEpisodeList(episodes) {
-        const episodesBySeason = episodes.reduce((acc, episode) => {
-            const season = parseInt(episode.episode.substring(1, 3));
-            if (!acc[season]) acc[season] = [];
-            acc[season].push(episode);
-            return acc;
-        }, {});
-        episodeListContainer.innerHTML = '';
-        for (const season in episodesBySeason) {
-            const seasonGroup = document.createElement('div');
-            seasonGroup.classList.add('season-group');
-            seasonGroup.innerHTML = `<h3>${t('Season')} ${season}</h3>`;
-            episodesBySeason[season].forEach(episode => {
-                const episodeElement = document.createElement('div');
-                episodeElement.classList.add('episode-item');
-                episodeElement.textContent = `${episode.episode}: ${episode.name}`;
-                episodeElement.dataset.episodeId = episode.id;
-                episodeElement.addEventListener('click', () => {
-                    document.querySelectorAll('.episode-item').forEach(el => el.classList.remove('active'));
-                    episodeElement.classList.add('active');
-                    displayEpisodeDetails(episode.id);
-                });
-                seasonGroup.appendChild(episodeElement);
+    // NEU: Rendert die Episodenliste für eine ausgewählte Staffel
+    function renderEpisodesForSeason(seasonNumber) {
+        const episodes = episodesBySeason[seasonNumber];
+        episodeListContainer.innerHTML = episodes.map(episode => `
+            <div class="episode-item" data-episode-id="${episode.id}">
+                ${episode.episode}: ${episode.name}
+            </div>
+        `).join('');
+        
+        // Füge Klick-Listener zu den neuen Episoden-Items hinzu
+        document.querySelectorAll('.episode-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.episode-item').forEach(el => el.classList.remove('active'));
+                item.classList.add('active');
+                displayEpisodeDetails(item.dataset.episodeId);
             });
-            episodeListContainer.appendChild(seasonGroup);
-        }
+        });
     }
 
     async function displayEpisodeDetails(episodeId) {
@@ -83,7 +77,6 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const episodeResponse = await fetch(`${API_BASE_URL}/episode/${episodeId}`);
             const episode = await episodeResponse.json();
-            
             const characterPromises = episode.characters.map(url => fetch(url).then(res => res.json()));
             currentEpisodeCharacters = await Promise.all(characterPromises);
 
@@ -103,37 +96,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     `).join('')}
                 </div>
             `;
-            
-            // KORRIGIERT: Event-Listener für die neuen Karten hinzufügen
-            addCardClickListeners();
-
         } catch (error) {
             episodeDetailsContainer.innerHTML = `<p>${t('Error loading details. Get Schwifty!')}</p>`;
-            console.error(error);
         } finally {
             hideLoader();
         }
     }
-    
-    // KORRIGIERT & NEU: Diese Funktion registriert die Klicks auf den Karten
-    function addCardClickListeners() {
-        const cards = document.querySelectorAll('.character-card');
-        cards.forEach(card => {
-            card.addEventListener('click', () => {
-                const characterId = parseInt(card.dataset.characterId);
-                const character = currentEpisodeCharacters.find(c => c.id === characterId);
-                if (character) {
-                    showCharacterModal(character);
-                }
-            });
-        });
-    }
 
     function showCharacterModal(character) {
-        // NEU: Erstelle den dynamischen Wiki-Link
-        const wikiName = character.name.replace(/ /g, '_'); // Ersetzt Leerzeichen durch Unterstriche
+        const wikiName = character.name.replace(/ /g, '_');
         const wikiUrl = `https://rickandmorty.fandom.com/wiki/${wikiName}`;
-
         modalCharacterDetails.innerHTML = `
             <div class="modal-character-layout">
                 <img src="${character.image}" alt="${character.name}">
@@ -143,30 +115,60 @@ document.addEventListener('DOMContentLoaded', () => {
                     <p><strong>${t('Species')}:</strong> ${t(character.species)}</p>
                     <p><strong>${t('Origin:')}</strong> ${character.origin.name}</p>
                     <p><strong>${t('Last known location:')}</strong> ${character.location.name}</p>
-                    
                     <a href="${wikiUrl}" target="_blank" class="wiki-link">${t('Read more on the Wiki')}</a>
                 </div>
-            </div>
-        `;
+            </div>`;
         modal.classList.add('visible');
     }
 
     function closeCharacterModal() {
         modal.classList.remove('visible');
     }
-    
-    modalCloseButton.addEventListener('click', closeCharacterModal);
-    modal.addEventListener('click', (event) => {
-        if (event.target === modal) {
-            closeCharacterModal();
+
+    // =============================================
+    // KORRIGIERT: Der robuste Klick-Listener für Charaktere (Event Delegation)
+    // =============================================
+    episodeDetailsContainer.addEventListener('click', (event) => {
+        const card = event.target.closest('.character-card');
+        if (card) {
+            const characterId = parseInt(card.dataset.characterId);
+            const character = currentEpisodeCharacters.find(c => c.id === characterId);
+            if (character) {
+                showCharacterModal(character);
+            }
         }
     });
 
+    modalCloseButton.addEventListener('click', closeCharacterModal);
+    modal.addEventListener('click', (event) => {
+        if (event.target === modal) closeCharacterModal();
+    });
+
     async function init() {
-        episodeListTitle.textContent = t('Episodes');
         welcomeMessageContainer.innerHTML = `<h2>${t('Choose an episode to see details!')}</h2><p>${t('Wubba Lubba Dub Dub!')}</p>`;
         const allEpisodes = await fetchAllEpisodes();
-        renderEpisodeList(allEpisodes);
+        
+        // Gruppiere Episoden nach Staffeln
+        episodesBySeason = allEpisodes.reduce((acc, episode) => {
+            const season = parseInt(episode.episode.substring(1, 3));
+            if (!acc[season]) acc[season] = [];
+            acc[season].push(episode);
+            return acc;
+        }, {});
+
+        populateSeasonSelector();
+        
+        // Zeige Episoden der ersten Staffel standardmäßig an
+        const firstSeason = Object.keys(episodesBySeason)[0];
+        renderEpisodesForSeason(firstSeason);
+        
+        // NEU: Event Listener für das Staffel-Dropdown
+        seasonSelect.addEventListener('change', (event) => {
+            renderEpisodesForSeason(event.target.value);
+            // Optional: Leere die Detailansicht bei Staffelwechsel
+            episodeDetailsContainer.innerHTML = '';
+            welcomeMessageContainer.style.display = 'block';
+        });
     }
 
     init();
