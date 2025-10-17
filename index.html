@@ -3,16 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rick and Morty Episodenguide</title>
+    <title>Rick and Morty Fan-Portal</title>
 
     <meta name="author" content="Dein Name">
-    <meta name="description" content="Ein interaktiver Episodenguide für die Serie Rick and Morty. Durchsuche alle Staffeln, Episoden und Charaktere.">
-    
-    <meta property="og:title" content="Rick and Morty Episodenguide">
-    <meta property="og:description" content="Der ultimative interaktive Guide für alle Fans von Rick and Morty.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://DEIN-GITHUB-USERNAME.github.io/DEIN-REPO-NAME/">
-    <meta property="og:image" content="https://rickandmortyapi.com/api/character/avatar/1.jpeg"> 
+    <meta name="description" content="Ein interaktives Fan-Portal für Rick and Morty mit Episodenguide und einer Mr. Meeseeks Box.">
+    <meta property="og:title" content="Rick and Morty Fan-Portal">
+    <meta property="og:description" content="Der ultimative interaktive Guide und KI-Chat für alle Fans von Rick and Morty.">
+    <meta property="og:image" content="https://rickandmortyapi.com/api/character/avatar/1.jpeg">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,25 +20,35 @@
 <body>
 
     <header>
-        <h1>Rick and Morty Episodenguide</h1>
-        <a href="meeseeks.html" class="back-link" style="position: absolute; top: 20px; right: 20px; text-decoration: none; font-weight: bold; font-size: 1.1rem;">
-            Frage Mr. Meeseeks! &rarr;
-        </a>
+        <h1>Rick and Morty Fan-Portal</h1>
     </header>
 
-    <main class="main-container">
-        <aside class="episode-list-container">
-            <div class="selection-controls">
-                <label for="season-select">Wähle eine Staffel:</label>
-                <select id="season-select" aria-label="Staffelauswahl"></select>
-            </div>
-            <div id="episode-list">
-                </div>
-        </aside>
+    <main class="page-container">
 
-        <section id="episode-details" class="episode-details-container">
-            <div id="welcome-message"></div>
-            </section>
+        <section class="meeseeks-box">
+            <h2>I'M MR. MEESEEKS, LOOK AT ME!</h2>
+            <p>Hast du eine Aufgabe für mich? Ich kann dir (fast) jede Frage beantworten. Existenz ist Schmerz!</p>
+            <a href="meeseeks.html" class="meeseeks-button">Öffne die Meeseeks Box</a>
+        </section>
+
+        <section class="episodeguide-box">
+            <h2>Episodenguide</h2>
+            <div class="episode-selectors">
+                <div class="selector-group">
+                    <label for="season-select">Staffel:</label>
+                    <select id="season-select"></select>
+                </div>
+                <div class="selector-group">
+                    <label for="episode-select">Folge:</label>
+                    <select id="episode-select" disabled></select>
+                </div>
+            </div>
+            <button id="show-episode-button" disabled>Folge anzeigen</button>
+            
+            <div id="episode-details" class="episode-details-container">
+                </div>
+        </section>
+
     </main>
 
     <div id="loader" class="loader-overlay" style="display: none;">
@@ -56,6 +63,5 @@
     </div>
 
     <script src="js/main.js"></script>
-
 </body>
 </html>
